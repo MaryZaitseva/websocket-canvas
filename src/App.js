@@ -7,7 +7,7 @@ class App extends React.Component {
     this.canvas = React.createRef();
     this.textField = React.createRef();
     this.state = {
-    	binaryData: null,
+    	data: null,
     };
   }
 
@@ -16,21 +16,30 @@ class App extends React.Component {
 		const ws = new WebSocket('ws://localhost:8080/');
 
     ws.onmessage = (event) => {
-      this.setState({binaryData: event.data});
+
+      this.setState({data: event.data});
       const canvas = this.refs.canvas;
       const ctx = canvas.getContext("2d");
       const imgData=ctx.createImageData(800,100);
-      let binaryData = this.state.binaryData;
+      let data = this.state.data;
+      let binaryData = [];
+
+      for(let i=0; i < data.length; i++) {
+        let binaryChar = Array.from(data[i].charCodeAt(0).toString(2));
+        binaryChar.length = 8;
+        binaryData.push(...binaryChar); 
+      }
 
       let j = 0;
       for (let i = 0; i < imgData.data.length; i+=4){
         if(j > binaryData.length){ 
           break;
         }
-        imgData.data[i+0] = imgData.data[i+1] = imgData.data[i+2] = +binaryData[j] ? 0 : 255;
+        imgData.data[i+0] = imgData.data[i+1] = imgData.data[i+2] = +!!binaryData[j] ? 0 : 255;
         imgData.data[i+3] = 255;
         j++;
       }
+
       ctx.putImageData(imgData,10,10);
     }
 	}
