@@ -25,12 +25,11 @@ class App extends React.Component {
       let binaryData = [];
 
       for(let i=0; i < data.length; i++) {
-        if(i===data.length-1 && binaryData.length < 80000){
-          i=0; 
-        }
         binaryData.push(...data[i].charCodeAt(0).toString(2)); 
       }
 
+      binaryData.push(...binaryData.slice(0, 15000));
+      console.log(binaryData);
       let j = 0;
       for (let i = 0; i < imgData.data.length; i+=4){
         if(j > binaryData.length){ 
